@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경일중학교 1학년 국어 교실</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans KR"', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4F46E5', // Indigo 600
+                        secondary: '#10B981', // Emerald 500
+                        accent: '#F59E0B', // Amber 500
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F3F4F6;
+        }
+        .class-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .class-btn.active {
+            background-color: #4F46E5;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
+        }
+        .tool-card {
+            transition: all 0.3s ease;
+        }
+        .tool-card:hover:not(.locked) {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+        /* 애니메이션 */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+        .shake-animation {
+            animation: shake 0.4s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Navigation / Logo Area -->
+    <nav class="bg-white border-b border-gray-100 py-4 px-6 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-5xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <!-- 로고 이미지 영역 -->
+                <img src="./images/logo.png" alt="경일국어교실 로고" class="w-10 h-10 object-contain" onerror="this.src='https://ui-avatars.com/api/?name=경일국어&background=4F46E5&color=fff&bold=true'">
+                <!-- 로고 텍스트 영역 -->
+                <span class="text-xl font-black text-gray-900 tracking-tight">경일국어교실</span>
+            </div>
+            <div class="hidden md:block text-sm font-medium text-gray-500">
+                <i class="far fa-calendar-alt mr-1"></i> <span id="current-date"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header / Hero Section -->
+    <header class="bg-gradient-to-r from-primary to-blue-500 text-white">
+        <div class="max-w-5xl mx-auto px-6 py-12 md:py-20 text-center">
+            <div class="inline-block bg-white/20 px-4 py-1.5 rounded-full text-sm font-semibold tracking-wider mb-4 backdrop-blur-sm text-white">
+                경일중학교 1학년
+            </div>
+            <h1 class="text-3xl md:text-5xl font-black mb-4 tracking-tight">
+                즐거운 <span class="text-yellow-300">국어</span> 교실 📚
+            </h1>
+            <p class="text-lg md:text-xl font-light text-blue-50 max-w-2xl mx-auto">
+                생각이 자라나고 마음이 넓어지는 시간! 국어 선생님과 함께하는 즐거운 배움터에 온 것을 환영합니다.
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-5xl mx-auto px-6 py-8 w-full">
+        
+        <!-- Step 1: 학급 선택 -->
+        <section class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8 mb-8 text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-primary"></div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Step 1. 우리 반을 선택해 주세요! 👇</h2>
+            <p class="text-gray-500 mb-6 text-sm md:text-base">클래스룸과 패들렛에 입장하려면 먼저 자신의 반을 꼭 선택해야 해요.</p>
+            
+            <div class="flex flex-wrap justify-center gap-3 md:gap-4" id="class-buttons">
+                <!-- Javascript로 동적 생성됨 -->
+            </div>
+        </section>
+
+        <!-- Message Box (Error/Info) -->
+        <div id="message-box" class="hidden max-w-md mx-auto mb-8 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-r shadow-sm transition-all" role="alert">
+            <p class="font-bold flex items-center gap-2">
+                <i class="fas fa-exclamation-circle"></i> 반 선택 확인
+            </p>
+            <p class="text-sm mt-1">위에 있는 버튼을 눌러 자신의 반을 먼저 선택해 주세요!</p>
+        </div>
+
+        <!-- Step 2: 학습 도구 -->
+        <section class="mb-12">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 px-2 flex items-center gap-2">
+                <i class="fas fa-rocket text-primary"></i> Step 2. 수업 바로가기
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- 구글 클래스룸 -->
+                <div id="card-classroom" class="tool-card locked bg-white rounded-2xl p-6 border border-gray-200 flex items-center gap-6 relative overflow-hidden group" onclick="openLink('classroom')">
+                    <div class="absolute -right-6 -top-6 text-gray-50 opacity-50 group-hover:opacity-100 transition-opacity">
+                        <i class="fas fa-chalkboard-teacher text-9xl"></i>
+                    </div>
+                    <div class="w-16 h-16 rounded-2xl bg-green-100 text-green-600 flex items-center justify-center text-3xl shadow-inner z-10 flex-shrink-0">
+                        <i class="fas fa-chalkboard"></i>
+                    </div>
+                    <div class="z-10">
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">구글 클래스룸</h3>
+                        <p class="text-gray-500 text-sm">과제 확인, 수업 자료 보기, 과제 제출하기</p>
+                        <div class="mt-3 flex items-center gap-2 text-sm font-semibold text-green-600" id="status-classroom">
+                            <i class="fas fa-lock"></i> 반을 선택하세요
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 패들렛 -->
+                <div id="card-padlet" class="tool-card locked bg-white rounded-2xl p-6 border border-gray-200 flex items-center gap-6 relative overflow-hidden group" onclick="openLink('padlet')">
+                    <div class="absolute -right-6 -top-6 text-gray-50 opacity-50 group-hover:opacity-100 transition-opacity">
+                        <i class="fas fa-sticky-note text-9xl"></i>
+                    </div>
+                    <div class="w-16 h-16 rounded-2xl bg-pink-100 text-pink-500 flex items-center justify-center text-3xl shadow-inner z-10 flex-shrink-0">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="z-10">
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">패들렛 (Padlet)</h3>
+                        <p class="text-gray-500 text-sm">우리들의 생각 나누기, 모둠 활동 결과물 공유</p>
+                        <div class="mt-3 flex items-center gap-2 text-sm font-semibold text-pink-500" id="status-padlet">
+                            <i class="fas fa-lock"></i> 반을 선택하세요
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 독서 링크 -->
+        <section class="mb-12">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 px-2 flex items-center gap-2">
+                <i class="fas fa-bookmark text-secondary"></i> 늘 함께하는 독서
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                <!-- 전자도서관 -->
+                <a href="https://reading.busanedu.net/" target="_blank" class="bg-white hover:bg-blue-50 rounded-xl p-5 border border-gray-200 flex items-center gap-4 transition-colors group shadow-sm">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                        <i class="fas fa-book-reader"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800">학교 전자도서관</h3>
+                        <p class="text-gray-500 text-xs mt-0.5">언제 어디서나 e-book 읽기</p>
+                    </div>
+                    <i class="fas fa-external-link-alt ml-auto text-gray-400 group-hover:text-blue-500"></i>
+                </a>
+
+                <!-- 독서로 -->
+                <a href="https://readin.edunet.net/" target="_blank" class="bg-white hover:bg-purple-50 rounded-xl p-5 border border-gray-200 flex items-center gap-4 transition-colors group shadow-sm">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                        <i class="fas fa-pen-nib"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800">독서로 사이트</h3>
+                        <p class="text-gray-500 text-xs mt-0.5">나만의 독서 기록 차곡차곡 쌓기</p>
+                    </div>
+                    <i class="fas fa-external-link-alt ml-auto text-gray-400 group-hover:text-purple-500"></i>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- 질문하기 섹션 -->
+        <section>
+            <h2 class="text-xl font-bold text-gray-800 mb-4 px-2 flex items-center gap-2">
+                <i class="fas fa-question-circle text-accent"></i> 궁금한 것이 있나요?
+            </h2>
+            <div class="bg-amber-50 rounded-2xl p-6 border border-amber-100 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+                <div class="w-16 h-16 rounded-full bg-white text-accent flex items-center justify-center text-3xl shadow-sm flex-shrink-0">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <div class="text-center md:text-left flex-grow">
+                    <h3 class="text-lg font-bold text-gray-800 mb-1">선생님께 질문하기</h3>
+                    <p class="text-gray-600 text-sm">수업 내용, 과제 방법 등 무엇이든 물어보세요! 선생님이 확인 후 답변해 줄게요.</p>
+                </div>
+                <!-- 질문하기 링크: 구글 폼이나 패들렛 링크로 수정하여 사용하세요 -->
+                <a href="https://forms.google.com" target="_blank" class="w-full md:w-auto bg-accent hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-xl transition-colors text-center flex items-center justify-center gap-2 shadow-md">
+                    <i class="fas fa-paper-plane"></i> 질문 남기기
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-400 py-8 text-center text-sm">
+        <p class="mb-2"><i class="fas fa-school mr-2"></i>경일중학교 국어과</p>
+        <p>© 2024 국어선생님. 학생들을 위한 따뜻한 마음으로 제작되었습니다.</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // 날짜 표시
+        const today = new Date();
+        document.getElementById('current-date').innerText = today.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+
+        // 선생님의 실제 링크로 수정하는 곳입니다!
+        const classData = {
+            1: {
+                classroom: "https://classroom.google.com/c/임시링크1반",
+                padlet: "https://padlet.com/임시링크1반"
+            },
+            2: {
+                classroom: "https://classroom.google.com/c/임시링크2반",
+                padlet: "https://padlet.com/임시링크2반"
+            },
+            3: {
+                classroom: "https://classroom.google.com/c/임시링크3반",
+                padlet: "https://padlet.com/임시링크3반"
+            },
+            4: {
+                classroom: "https://classroom.google.com/c/임시링크4반",
+                padlet: "https://padlet.com/임시링크4반"
+            },
+            5: {
+                classroom: "https://classroom.google.com/c/임시링크5반",
+                padlet: "https://padlet.com/임시링크5반"
+            }
+        };
+
+        let currentSelectedClass = null;
+
+        // 반 버튼 생성
+        const buttonContainer = document.getElementById('class-buttons');
+        for (let i = 1; i <= 5; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'class-btn bg-white border-2 border-gray-200 text-gray-600 font-bold py-3 px-6 md:px-8 rounded-full text-lg hover:border-primary hover:text-primary';
+            btn.innerText = `1학년 ${i}반`;
+            btn.onclick = () => selectClass(i, btn);
+            buttonContainer.appendChild(btn);
+        }
+
+        function selectClass(classNumber, btnElement) {
+            currentSelectedClass = classNumber;
+            
+            // 버튼 스타일 업데이트
+            document.querySelectorAll('.class-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.replace('border-primary', 'border-gray-200');
+            });
+            btnElement.classList.add('active');
+            btnElement.classList.replace('border-gray-200', 'border-primary');
+
+            // 메시지 박스 숨기기
+            document.getElementById('message-box').classList.add('hidden');
+
+            // 카드 잠금 해제 및 상태 업데이트
+            unlockCard('classroom', `${classNumber}반 클래스룸 입장하기`, 'fas fa-arrow-right');
+            unlockCard('padlet', `${classNumber}반 패들렛 입장하기`, 'fas fa-arrow-right');
+        }
+
+        function unlockCard(type, text, iconClass) {
+            const card = document.getElementById(`card-${type}`);
+            const status = document.getElementById(`status-${type}`);
+            
+            card.classList.remove('locked');
+            card.classList.add('cursor-pointer');
+            
+            status.innerHTML = `<i class="${iconClass}"></i> ${text}`;
+        }
+
+        function openLink(type) {
+            if (!currentSelectedClass) {
+                // 반이 선택되지 않은 경우 애니메이션과 메시지 표시
+                const msgBox = document.getElementById('message-box');
+                const btnContainer = document.getElementById('class-buttons');
+                
+                msgBox.classList.remove('hidden');
+                
+                btnContainer.classList.remove('shake-animation');
+                void btnContainer.offsetWidth; // trigger reflow
+                btnContainer.classList.add('shake-animation');
+                
+                // 해당 카드로 스크롤 올리기
+                btnContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            // 선택된 반의 실제 링크 가져오기
+            const url = classData[currentSelectedClass][type];
+            if (url) {
+                window.open(url, '_blank');
+            }
+        }
+    </script>
+</body>
+</html>
